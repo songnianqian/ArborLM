@@ -1,6 +1,10 @@
 # ArborLM
 
-### A Context-Indexed, HyperNetwork-Compressed, Branching Language Model
+### High Light
+
+A Context-Indexed, HyperNetwork-Compressed, Branching Language Model
+- Multiple experts and Hypernet FFN subsystem being ~15× smaller while holding LM performance.
+- Hierarchical tree with trunk and branching provide a scalable system that a monolithic network cannot provide.
 
 **ArborLM scales language-model capacity by branching rather than by continuously enlarging one monolithic network.**
 
@@ -55,7 +59,40 @@ The model was trained on `DKYoon/SlimPajama-6B` with 1024-token sequences.
 
 The MultiExpertsHyper FFN subsystem is roughly **15× smaller than the conventional Dense/Baseline FFN design it replaces**, while maintaining strong language-model performance.
 
-The six-path ArborLM model is currently undergoing long-run training.
+### Dense/Baseline 10,000-Step Result — In Progress
+
+A matched-horizon Dense/Baseline run is currently being extended to 10,000 steps. These values will replace the placeholders when the run completes.
+
+| Model | Training Step | PPL | Next-Token Accuracy |
+|---|---:|---:|---:|
+| MultiExpertsHyper | 10,000 | 33.87 | 40.87% |
+| **Dense/Baseline** | **10,000** | **TBD** | **TBD** |
+
+This comparison is intended to answer whether the much smaller MultiExpertsHyper FFN remains competitive with the conventional Dense/Baseline FFN at the same training horizon.
+
+### Six-Path ArborLM Result — In Progress
+
+The six-path d576 ArborLM model is currently undergoing long-run training together with Context Index PPL-feedback/refit experiments. Final routed and oracle results will be reported here.
+
+| Metric | Before PPL Refit | After PPL Refit |
+|---|---:|---:|
+| Training step | TBD | TBD |
+| Routed PPL | TBD | TBD |
+| Oracle PPL | TBD | TBD |
+| Routed − Oracle PPL gap | TBD | TBD |
+| Routed next-token accuracy | TBD | TBD |
+| Context Index routing distribution | TBD | TBD |
+
+Per-path results will be added once the long-run checkpoint and final PPL-refitted Context Index are available.
+
+| Path | Routing Share | Path PPL |
+|---|---:|---:|
+| P0 | TBD | TBD |
+| P1 | TBD | TBD |
+| P2 | TBD | TBD |
+| P3 | TBD | TBD |
+| P4 | TBD | TBD |
+| P5 | TBD | TBD |
 
 ---
 
@@ -796,7 +833,13 @@ A controlled Dense/Baseline model was trained using the same training pipeline.
 
 The Dense/Baseline model learned faster initially, while MultiExpertsHyper caught up and moved ahead during the early training run.
 
-The Dense/Baseline model was not trained to the same 10,000-step horizon because of available compute, so no claim is made about final asymptotic superiority.
+A matched 10,000-step Dense/Baseline run is now in progress. Until that run completes, no claim is made about final asymptotic superiority.
+
+| Step | Dense/Baseline PPL | MultiExpertsHyper PPL |
+|---:|---:|---:|
+| 10,000 | **TBD** | **33.87** |
+
+The purpose of the completed comparison will be to test parameter efficiency at the same training horizon: whether the substantially compressed MultiExpertsHyper FFN can remain competitive with a conventional Dense/Baseline FFN while using far fewer FFN parameters.
 
 ---
 
@@ -993,7 +1036,9 @@ Important open questions include:
 ✓ Frozen mature teacher
 ✓ Knowledge-distillation training
 ✓ 100-step multipath/KD validation
+→ Dense/Baseline 10,000-step matched run in progress
 → Long-run six-path training in progress
+→ Multipath Context Index PPL-feedback/refit in progress
 ```
 
 ---
