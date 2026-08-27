@@ -203,7 +203,7 @@ $$
 The latent state is passed through GELU and scaled elementwise by a learned vector $\alpha$:
 
 $$
-g=\operatorname{GELU}(s)\odot\alpha,
+g=\mathrm{GELU}(s)\odot\alpha,
 \qquad
 \alpha\in\mathbb{R}^{N}.
 $$
@@ -225,7 +225,7 @@ $$
 Therefore the complete expert is the nonlinear map
 
 $$
-\boxed{\,F_N(x) = V^{\top}\left[\operatorname{GELU}(Wx+b)\odot\alpha\right] + b_{\text{out}}\,}
+\boxed{\,F_N(x) = V^{\top}\left[\mathrm{GELU}(Wx+b)\odot\alpha\right] + b_{\text{out}}\,}
 $$
 
 with
@@ -332,7 +332,7 @@ p_i(x)
 \left[
 V_i^{\top}
 \left(
-\operatorname{GELU}(W_i x+b_i)\odot\alpha_i
+\mathrm{GELU}(W_i x+b_i)\odot\alpha_i
 \right)
 +b_{\text{out},i}
 \right].
@@ -432,7 +432,7 @@ A small number of centroids does **not** imply that the model has only that many
 If the controller computes relationships
 
 $$
-s_i=\operatorname{sim}(h,c_i),
+s_i=\mathrm{sim}(h,c_i),
 $$
 
 then the complete vector
