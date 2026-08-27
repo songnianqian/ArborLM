@@ -170,21 +170,214 @@ reglu1d
 film
 ```
 
-Their outputs are combined through a learned soft mixture.
-
-Conceptually,
+Each expert is itself a complete learned transformation from the Transformer hidden state back to the same hidden space:
 
 \[
-F(x)=\sum_{i=1}^{E} g_i(x)E_i(x),
+F_i:\mathbb{R}^{E}\rightarrow\mathbb{R}^{E}.
 \]
 
-where \(E_i\) is an expert transformation and \(g_i(x)\) is its learned contribution.
+Here, \(E\) is the Transformer hidden width. The internal representation of an expert can be extremely small even though its input and output both remain \(E\)-dimensional.
+
+## 3.1 Exact Example: `ExpertC_RankN`
+
+For an input hidden vector
+
+\[
+x\in\mathbb{R}^{E},
+\]
+
+`ExpertC_RankN` first projects the hidden state into an \(N\)-dimensional latent space:
+
+\[
+s = Wx+b,
+\]
+
+where
+
+\[
+W\in\mathbb{R}^{N\times E},
+\qquad
+b\in\mathbb{R}^{N}.
+\]
+
+The latent state is passed through GELU and scaled elementwise by a learned vector \(\alpha\):
+
+\[
+g=\operatorname{GELU}(s)\odot\alpha,
+\qquad
+\alpha\in\mathbb{R}^{N}.
+\]
+
+It is then projected back to the Transformer hidden width:
+
+\[
+y=V^{\top}g+b_{\text{out}},
+\]
+
+with
+
+\[
+V\in\mathbb{R}^{N\times E},
+\qquad
+b_{\text{out}}\in\mathbb{R}^{E}.
+\]
+
+Therefore the complete expert is the nonlinear map
+
+\[
+\boxed{
+F_N(x)
+=
+V^{\top}
+\left[
+\operatorname{GELU}(Wx+b)\odot\alpha
+\right]
++b_{\text{out}}
+}
+\]
+
+with
+
+\[
+F_N:\mathbb{R}^{E}\rightarrow\mathbb{R}^{E}.
+\]
+
+For `ExpertC_Rank4`, \(N=4\):
+
+\[
+x\in\mathbb{R}^{E}
+\rightarrow
+s\in\mathbb{R}^{4}
+\rightarrow
+g\in\mathbb{R}^{4}
+\rightarrow
+y\in\mathbb{R}^{E}.
+\]
+
+Thus the expert learns a full hidden-state-to-hidden-state function even though the nonlinear bottleneck contains only four latent values.
+
+If all parameters shown above are trainable, the parameter count is
+
+\[
+P_{\text{RankN}}
+=NE+N+N+NE+E
+=2NE+2N+E.
+\]
+
+For \(N=4\),
+
+\[
+P_{\text{Rank4}}=9E+8.
+\]
+
+At \(E=768\), this is
+
+\[
+P_{\text{Rank4}}
+=9(768)+8
+=6,920
+\]
+
+parameters.
+
+For comparison, a conventional Dense/Baseline GPT-2-style FFN uses the expansion
+
+\[
+E\rightarrow4E\rightarrow E,
+\]
+
+whose two weight matrices alone contain
+
+\[
+8E^2
+\]
+
+weights. At \(E=768\), that is
+
+\[
+8(768)^2=4,718,592
+\]
+
+weights before biases.
+
+## 3.2 Soft Mixing Creates a Richer Effective Function
+
+Every expert produces its own learned mapping
+
+\[
+y_i=F_i(x).
+\]
+
+The soft gate produces input-dependent mixture weights. If the gate logits are \(a_i(x)\), then
+
+\[
+p_i(x)
+=
+\frac{\exp(a_i(x))}
+{\sum_j\exp(a_j(x))}.
+\]
+
+The combined MultiExpertsHyper transformation is
+
+\[
+\boxed{
+F_{\text{mix}}(x)
+=
+\sum_{i=1}^{M}p_i(x)F_i(x)
+}
+\]
+
+where \(M\) is the number of experts.
+
+This is not simply one fixed low-rank matrix. Both the expert outputs and their mixture weights depend on the input:
+
+\[
+p_i=p_i(x),
+\qquad
+F_i=F_i(x).
+\]
+
+For a collection of rank-style experts, the effective function can be written explicitly as
+
+\[
+F_{\text{mix}}(x)
+=
+\sum_{i=1}^{M}
+p_i(x)
+\left[
+V_i^{\top}
+\left(
+\operatorname{GELU}(W_i x+b_i)\odot\alpha_i
+\right)
++b_{\text{out},i}
+\right].
+\]
+
+MultiExpertsHyper goes further by using **heterogeneous** expert structures rather than only copies of one rank-\(N\) form. The result is an input-conditioned soft combination of several different nonlinear functions.
+
+> **Each compact expert is a complete learned map \(F_i:\mathbb{R}^{E}\rightarrow\mathbb{R}^{E}\). The soft mixture then constructs an input-dependent effective map \(F_{\text{mix}}(x)=\sum_i p_i(x)F_i(x)\), allowing a much richer function family than any one tiny expert alone.**
 
 The important difference from a conventional large MoE is that MultiExpertsHyper is not simply making many copies of the same large FFN.
 
 The experts are deliberately **small and structurally heterogeneous**.
 
-The hypothesis is that several cheap but different transformations can span a richer useful function family than one equally small homogeneous FFN.
+The working hypothesis is that
+
+\[
+\boxed{
+\text{small individual }F_i
++
+\text{heterogeneous }F_i
++
+\text{input-dependent soft mixing}
++
+\text{HyperNet conditioning}
+\Rightarrow
+\text{a rich effective }F
+}
+\]
+
+while using far fewer FFN parameters than a conventional dense design.
 
 Importantly, the mature MultiExpertsHyper model does not collapse onto one expert. All expert types remain active with substantial gate mass.
 
