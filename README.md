@@ -225,15 +225,7 @@ $$
 Therefore the complete expert is the nonlinear map
 
 $$
-\boxed{
-F_N(x)
-=
-V^{\top}
-\left[
-\operatorname{GELU}(Wx+b)\odot\alpha
-\right]
-+b_{\text{out}}
-}
+\boxed{\,F_N(x) = V^{\top}\left[\operatorname{GELU}(Wx+b)\odot\alpha\right] + b_{\text{out}}\,}
 $$
 
 with
@@ -311,20 +303,13 @@ $$
 The soft gate produces input-dependent mixture weights. If the gate logits are $a_i(x)$, then
 
 $$
-p_i(x)
-=
-\frac{\exp(a_i(x))}
-{\sum_j\exp(a_j(x))}.
+p_i(x) = \frac{\exp(a_i(x))}{\sum_j \exp(a_j(x))}.
 $$
 
 The combined MultiExpertsHyper transformation is
 
 $$
-\boxed{
-F_{\text{mix}}(x)
-=
-\sum_{i=1}^{M}p_i(x)F_i(x)
-}
+\boxed{\,F_{\text{mix}}(x) = \sum_{i=1}^{M} p_i(x)\,F_i(x)\,}
 $$
 
 where $M$ is the number of experts.
@@ -355,7 +340,19 @@ $$
 
 MultiExpertsHyper goes further by using **heterogeneous** expert structures rather than only copies of one rank-$N$ form. The result is an input-conditioned soft combination of several different nonlinear functions.
 
-> **Each compact expert is a complete learned map $F_i:\mathbb{R}^{E}\rightarrow\mathbb{R}^{E}$. The soft mixture then constructs an input-dependent effective map $F_{\text{mix}}(x)=\sum_i p_i(x)F_i(x)$, allowing a much richer function family than any one tiny expert alone.**
+**Each compact expert is a complete learned map**
+
+$$
+F_i:\mathbb{R}^{E}\rightarrow\mathbb{R}^{E}.
+$$
+
+**The soft mixture then constructs an input-dependent effective map**
+
+$$
+F_{\text{mix}}(x)=\sum_i p_i(x)\,F_i(x),
+$$
+
+**allowing a much richer function family than any one tiny expert alone.**
 
 The important difference from a conventional large MoE is that MultiExpertsHyper is not simply making many copies of the same large FFN.
 
@@ -364,17 +361,7 @@ The experts are deliberately **small and structurally heterogeneous**.
 The working hypothesis is that
 
 $$
-\boxed{
-\text{small individual }F_i
-+
-\text{heterogeneous }F_i
-+
-\text{input-dependent soft mixing}
-+
-\text{HyperNet conditioning}
-\Rightarrow
-\text{a rich effective }F
-}
+\boxed{\ \text{small } F_i \;+\; \text{heterogeneous } F_i \;+\; \text{soft mixing} \;+\; \text{HyperNet conditioning} \;\Rightarrow\; \text{a rich effective } F\ }
 $$
 
 while using far fewer FFN parameters than a conventional dense design.
@@ -573,24 +560,16 @@ The paths are therefore **not simply source IDs**.
 
 The initial semantic Context Index answers:
 
-$$
-\text{Which contexts look similar?}
-$$
+> *Which contexts look similar?*
 
 But once specialist paths have trained, the language model can answer a different question:
 
-$$
-\text{Which path actually models this context best?}
-$$
+> *Which path actually models this context best?*
 
 For an input $x$, candidate paths can be evaluated by negative log-likelihood:
 
 $$
-L_i(x)
-=
--\frac{1}{T}
-\sum_t
-\log p_i(x_t|x_{<t}).
+L_i(x) = -\frac{1}{T} \sum_t \log p_i(x_t \mid x_{<t}).
 $$
 
 The corresponding perplexity is
@@ -623,15 +602,7 @@ semantic Context Index
 Conceptually:
 
 $$
-\boxed{
-\text{Index}
-\rightarrow
-\text{LM}
-\rightarrow
-\text{PPL feedback}
-\rightarrow
-\text{Index refit}
-}
+\boxed{\ \text{Index} \rightarrow \text{LM} \rightarrow \text{PPL feedback} \rightarrow \text{Index refit}\ }
 $$
 
 The refitted index is then frozen again while LM training continues.
@@ -945,11 +916,7 @@ The Context Index therefore becomes not only a classifier but also a **predictiv
 Future routing can combine:
 
 $$
-\text{semantic context}
-+
-\text{conversation history}
-+
-\text{branch PPL feedback}.
+\text{semantic context} + \text{conversation history} + \text{branch PPL feedback}
 $$
 
 ---
