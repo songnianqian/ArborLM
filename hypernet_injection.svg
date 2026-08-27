@@ -1,0 +1,114 @@
+<svg viewBox="0 0 900 640" xmlns="http://www.w3.org/2000/svg">
+  <rect width="900" height="640" fill="#f8f9fa"/>
+
+  <!-- Title -->
+  <text x="450" y="30" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#2c3e50">
+    Hypernet Controller — Centroids &amp; Injection into the MLP
+  </text>
+  <text x="450" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#7f8c8d">
+    Shared controller reads the stream through M learned concepts, emits a reasoning vector, injects a gated correction
+  </text>
+
+  <!-- ============ LEFT: the transformer layer / MLP ============ -->
+  <rect x="55" y="110" width="330" height="470" fill="#fdf6e3" stroke="#e67e22" stroke-width="2" rx="10"/>
+  <text x="220" y="132" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#d35400">Transformer Layer (MLP block)</text>
+
+  <!-- hidden state in -->
+  <rect x="140" y="510" width="160" height="40" fill="#e8f4f8" stroke="#3498db" stroke-width="2" rx="5"/>
+  <text x="220" y="529" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#2c3e50">Hidden state X</text>
+  <text x="220" y="543" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#7f8c8d">[B, S, E=7168]</text>
+
+  <!-- up projection -->
+  <line x1="220" y1="510" x2="220" y2="470" stroke="#2c3e50" stroke-width="2"/>
+  <rect x="140" y="430" width="160" height="40" fill="#f39c12" stroke="#e67e22" stroke-width="2" rx="5"/>
+  <text x="220" y="449" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">Linear  E → 4E</text>
+  <text x="220" y="462" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">feed-forward hidden h_ffn</text>
+
+  <!-- injection point (the +) -->
+  <line x1="220" y1="430" x2="220" y2="395" stroke="#2c3e50" stroke-width="2"/>
+  <circle cx="220" cy="380" r="18" fill="#34495e" stroke="#2c3e50" stroke-width="3"/>
+  <text x="220" y="386" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">+</text>
+  <text x="220" y="352" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#c0392b" font-weight="bold">inject BEFORE activation</text>
+
+  <!-- activation -->
+  <line x1="220" y1="362" x2="220" y2="330" stroke="#2c3e50" stroke-width="2"/>
+  <rect x="150" y="290" width="140" height="40" fill="#f39c12" stroke="#e67e22" stroke-width="2" rx="5"/>
+  <text x="220" y="315" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white">GELU</text>
+
+  <!-- down projection -->
+  <line x1="220" y1="290" x2="220" y2="255" stroke="#2c3e50" stroke-width="2"/>
+  <rect x="140" y="215" width="160" height="40" fill="#f39c12" stroke="#e67e22" stroke-width="2" rx="5"/>
+  <text x="220" y="240" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">Linear  4E → E</text>
+
+  <!-- output -->
+  <line x1="220" y1="215" x2="220" y2="180" stroke="#2c3e50" stroke-width="2"/>
+  <rect x="140" y="140" width="160" height="40" fill="#2ecc71" stroke="#27ae60" stroke-width="2" rx="5"/>
+  <text x="220" y="159" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">Output y</text>
+  <text x="220" y="173" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">[B, S, E]</text>
+
+  <!-- tap from X to controller -->
+  <circle cx="300" cy="530" r="5" fill="#8e44ad"/>
+  <path d="M 300 530 L 430 530" stroke="#8e44ad" stroke-width="2" fill="none"/>
+  <polygon points="430,530 420,525 420,535" fill="#8e44ad"/>
+  <text x="365" y="522" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#8e44ad">read X</text>
+
+  <!-- ============ RIGHT: the hypernet controller ============ -->
+  <rect x="440" y="110" width="425" height="470" fill="#f5eef8" stroke="#8e44ad" stroke-width="2" rx="10"/>
+  <text x="652" y="132" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#8e44ad">Hypernet Controller (shared across layers)</text>
+
+  <!-- STEP 1: rotary encode + normalize -->
+  <rect x="460" y="490" width="180" height="60" fill="#9b59b6" stroke="#8e44ad" stroke-width="2" rx="6"/>
+  <text x="550" y="508" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">① Rotary-encode + L2-norm</text>
+  <text x="550" y="523" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">Y = [sin, cos] of rotated X</text>
+  <text x="550" y="537" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">Ŷ = Y / ‖Y‖₂  (value + rate)</text>
+
+  <!-- CENTROID BANK -->
+  <rect x="670" y="470" width="175" height="80" fill="#ffffff" stroke="#8e44ad" stroke-width="2" rx="6"/>
+  <text x="757" y="487" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#8e44ad">Centroids  c₁ … c_M</text>
+  <text x="757" y="500" text-anchor="middle" font-family="Arial, sans-serif" font-size="8.5" fill="#7f8c8d">concept dictionary · M×E · normalized ĉᵢ</text>
+  <!-- little lighthouse dots -->
+  <circle cx="692" cy="518" r="6" fill="#e74c3c"/>
+  <circle cx="717" cy="530" r="6" fill="#27ae60"/>
+  <circle cx="742" cy="515" r="6" fill="#3498db"/>
+  <circle cx="767" cy="532" r="6" fill="#f39c12"/>
+  <circle cx="792" cy="518" r="6" fill="#e91e63"/>
+  <circle cx="817" cy="530" r="6" fill="#00acc1"/>
+  <text x="757" y="546" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#7f8c8d">M ≈ 128–256 "lighthouses"</text>
+
+  <!-- STEP 2: cosine-sim softmax -->
+  <line x1="550" y1="490" x2="550" y2="450" stroke="#8e44ad" stroke-width="2"/>
+  <line x1="757" y1="470" x2="757" y2="452" stroke="#8e44ad" stroke-width="2"/>
+  <line x1="757" y1="452" x2="640" y2="452" stroke="#8e44ad" stroke-width="2"/>
+  <rect x="460" y="410" width="360" height="42" fill="#9b59b6" stroke="#8e44ad" stroke-width="2" rx="6"/>
+  <text x="640" y="428" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">② Soft-assign:  pᵢ = softmax_i( ⟨Ŷ, ĉᵢ⟩ )</text>
+  <text x="640" y="443" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">full distribution over M concepts (not a hard pick) · p ∈ ℝ^M</text>
+
+  <!-- STEP 3: reasoning vector -->
+  <line x1="640" y1="410" x2="640" y2="375" stroke="#8e44ad" stroke-width="2"/>
+  <rect x="480" y="335" width="320" height="40" fill="#6c3483" stroke="#4a235a" stroke-width="2" rx="6"/>
+  <text x="640" y="352" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">③ Reasoning vector  r ∈ ℝ^{3M}</text>
+  <text x="640" y="366" text-anchor="middle" font-family="Arial, sans-serif" font-size="8.5" fill="white">routing dist. p  +  two rate-of-change (phase) channels</text>
+
+  <!-- injection matrix -->
+  <line x1="640" y1="335" x2="640" y2="300" stroke="#8e44ad" stroke-width="2"/>
+  <rect x="500" y="258" width="280" height="42" fill="#c0392b" stroke="#922b21" stroke-width="2" rx="6"/>
+  <text x="640" y="276" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Gated projection  α · W_inj · r</text>
+  <text x="640" y="290" text-anchor="middle" font-family="Arial, sans-serif" font-size="8.5" fill="white">W_inj : ℝ^{3M} → ℝ^{4E}   ·   α = learned gate, init ≈ 0</text>
+
+  <!-- arrow crossing back to the + in the MLP -->
+  <path d="M 500 279 C 380 279, 300 340, 240 372" stroke="#c0392b" stroke-width="2.5" fill="none"/>
+  <polygon points="240,372 251,369 247,380" fill="#c0392b"/>
+  <text x="360" y="300" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#c0392b" font-weight="bold">h_ffn ← h_ffn + α·W_inj·r</text>
+
+  <!-- safety note -->
+  <rect x="480" y="150" width="360" height="90" fill="#eafaf1" stroke="#27ae60" stroke-width="1.5" stroke-dasharray="5,4" rx="6"/>
+  <text x="660" y="169" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#1e8449">Why it's safe (α ≈ 0 at init)</text>
+  <text x="497" y="187" font-family="Arial, sans-serif" font-size="9" fill="#196f3d">• Backbone starts from pretrained weights; α near zero</text>
+  <text x="497" y="202" font-family="Arial, sans-serif" font-size="9" fill="#196f3d">• Augmented model begins IDENTICAL to baseline</text>
+  <text x="497" y="217" font-family="Arial, sans-serif" font-size="9" fill="#196f3d">• Training admits only signal that reduces loss</text>
+  <text x="497" y="232" font-family="Arial, sans-serif" font-size="9" fill="#196f3d">• Can't do worse than baseline — capacity for free</text>
+
+  <!-- lighthouse insight strip -->
+  <rect x="460" y="118" width="380" height="26" fill="none"/>
+  <text x="650" y="136" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#8e44ad" font-style="italic">Few centroids, vast space: the profile over M is a coordinate, not a 1-of-M label</text>
+</svg>

@@ -4,6 +4,8 @@
 
 **ArborLM scales language-model capacity by branching rather than by continuously enlarging one monolithic network.**
 
+![ArborLM Architecture](https://github.com/songnianqian/ArborLM/raw/main/MultiplePath.png)
+
 A shared Transformer trunk learns broad language and common computation. A separate **Context Index** routes each input to a specialist branch. Inside the model, large conventional dense FFNs are replaced by a much smaller combination of **heterogeneous experts and shared HyperNetworks**.
 
 As branches become more specialized, ArborLM can also reduce their hidden width. Because many Transformer parameter terms scale approximately with the square of hidden width, progressively narrower branches provide another strong reduction in model size.
@@ -189,6 +191,8 @@ Importantly, the mature MultiExpertsHyper model does not collapse onto one exper
 ---
 
 # 4. HyperNet: Reusing Computation Across Depth
+
+![Hypernet Architecture](https://github.com/songnianqian/ArborLM/raw/main/hypernet_injection.svg)
 
 The second major component is the **HyperNetwork**.
 
