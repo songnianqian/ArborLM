@@ -325,17 +325,7 @@ $$
 For a collection of rank-style experts, the effective function can be written explicitly as
 
 $$
-F_{\text{mix}}(x)
-=
-\sum_{i=1}^{M}
-p_i(x)
-\left[
-V_i^{\top}
-\left(
-\mathrm{GELU}(W_i x+b_i)\odot\alpha_i
-\right)
-+b_{\text{out},i}
-\right].
+F_{\text{mix}}(x) = \sum_{i=1}^{M} p_i(x) \left[ V_i^{\top} \left( \mathrm{GELU}(W_i x + b_i) \odot \alpha_i \right) + b_{\text{out},i} \right].
 $$
 
 MultiExpertsHyper goes further by using **heterogeneous** expert structures rather than only copies of one rank-$N$ form. The result is an input-conditioned soft combination of several different nonlinear functions.
@@ -569,7 +559,7 @@ But once specialist paths have trained, the language model can answer a differen
 For an input $x$, candidate paths can be evaluated by negative log-likelihood:
 
 $$
-L_i(x) = -\frac{1}{T} \sum_t \log p_i(x_t \mid x_{<t}).
+L_i(x) = -\frac{1}{T} \sum_t \log p_i(x_t \mid x_{\lt t}).
 $$
 
 The corresponding perplexity is
